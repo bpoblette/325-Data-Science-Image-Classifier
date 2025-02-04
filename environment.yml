@@ -523,7 +523,6 @@ dependencies:
       - nvidia-nvtx-cu12==12.4.127
       - opencv-python==4.11.0.86
       - opencv-python-headless==4.10.0.84
-      - python-graphviz==0.20.3
       - roboflow==1.1.53
       - sympy==1.13.1
       - torch==2.6.0
