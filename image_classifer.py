@@ -8,7 +8,7 @@ class ImageClassifier:
         self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
         self.version = self.project.version(1)
         self.dataset = self.version.download("yolov8")
-        self.model = YOLO("runs/detect/train8/weights/best.pt")
+        self.model = YOLO("runs/detect/train18/weights/best.pt")
 
 
     def train(self, training_set, epochs=10, imgsz=640):
@@ -41,3 +41,5 @@ def main():
 if __name__ == "__main__":
     main()
 
+# Todo: Create a service which will process video files into frames that can be processed by the yolo model.
+# Use bittorrent for getting the video files for season 1 of the walking dead
