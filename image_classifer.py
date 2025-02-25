@@ -8,10 +8,10 @@ class ImageClassifier:
         self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
         self.version = self.project.version(1)
         self.dataset = self.version.download("yolov8")
-        self.model = YOLO("runs/detect/train18/weights/best.pt")
+        self.model = YOLO("runs/detect/train19/weights/best.pt")
 
 
-    def train(self, training_set, epochs=10, imgsz=640):
+    def train(self, training_set, epochs=20, imgsz=640):
         self.model.train(data=training_set, epochs=epochs, imgsz=imgsz)
 
     def test(self, test_images_folder):
@@ -32,7 +32,7 @@ def main():
     dataset_yaml = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/data.yaml"
 
     # Train model
-    classifier.train(training_set=dataset_yaml, epochs=10, imgsz=640)
+    classifier.train(training_set=dataset_yaml, epochs=20, imgsz=640)
 
     # Testing the model
     test_images_folder = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/test/images"
