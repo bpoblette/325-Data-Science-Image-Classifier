@@ -12,7 +12,7 @@ updates:
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/"  # Root directory where package.json is located
+    directory: "/vue-frontend"  # Root directory where package.json is located
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
