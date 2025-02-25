@@ -2,13 +2,13 @@ name: Python Package using Conda
 
 on: [push]
 
-permissions:
-  contents: read
-  issues: write 
-  pull-requests: write  
 
 jobs:
   build-linux:
+    permissions:
+      contents: read
+      issues: write 
+      pull-requests: write  
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
