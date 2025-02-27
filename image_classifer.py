@@ -41,5 +41,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Todo: Create a service which will process video files into frames that can be processed by the yolo model.
-# Use bittorrent for getting the video files for season 1 of the walking dead
+# To do: Create a service which will take pictures using a computers camera. 
