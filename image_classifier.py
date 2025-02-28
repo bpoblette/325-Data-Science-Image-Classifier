@@ -1,6 +1,7 @@
 from roboflow import Roboflow
 from ultralytics import YOLO
 import cv2
+import numpy as np
 
 class ImageClassifier:
     def __init__(self):
@@ -25,12 +26,20 @@ class ImageClassifier:
             cv2.waitKey(0)  # Wait for key press
             cv2.destroyAllWindows()
     
-    def predict(self, image):
+    def predict(self, image: np.ndarray):
         result = self.model.predict(source=image,conf=1, save=True, save_txt=True)
-        img = result.plot()
-        cv2.imshow("Detection",img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        predictions = []
+
+        for r in result:
+            for box in r.boxes:
+                predictions.append({
+                    "class": r.names[int(box.cls[0])],
+                    "confidence": float(box.conf[0]), 
+                    "bbox": box.xyxy[0].tolist()
+                })
+        return predictions
+
+
 
 def main():
     classifier = ImageClassifier()
