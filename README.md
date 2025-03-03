@@ -9,3 +9,7 @@ How to push download updates:
 # Routes:
 ## Predict Route:
 * http://127.0.0.1:8000/predict
+
+# Python Environement:
+## To start Python environment
+* myenv\Scripts\activate

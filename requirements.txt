@@ -48,7 +48,6 @@ fonttools==4.49.0
 fsspec==2025.2.0
 google-auth==2.6.0
 gunicorn==23.0.0
-gyp==0.1
 h11==0.14.0
 h2==4.1.0
 hpack==4.0.0
@@ -132,7 +131,6 @@ PyJWT==2.4.0
 pylint==2.12.2
 pyparsing==2.4.7
 pytest==8.3.4
-python-apt==2.4.0+ubuntu4
 python-dateutil==2.8.2
 python-dotenv==1.0.1
 python-engineio==4.10.1
@@ -176,11 +174,8 @@ triton==3.2.0
 typer==0.15.1
 typing_extensions==4.12.2
 tzdata==2025.1
-ubuntu-pro-client==8001
-ufw==0.36.1
 ultralytics==8.3.71
 ultralytics-thop==2.0.14
-unattended-upgrades==0.1
 urllib3==2.3.0
 uvicorn==0.34.0
 uvloop==0.21.0
