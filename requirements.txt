@@ -23,7 +23,7 @@ filelock==3.17.0
 filetype==1.2.0
 flash==1.0.3
 Flask==3.0.3
-Flask-SocketIO==5.4.1
+Flask-SocketIO==5.5.1
 fonttools==4.49.0
 fsspec==2025.2.0
 gyp==0.1
