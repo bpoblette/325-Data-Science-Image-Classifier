@@ -33,7 +33,7 @@ httplib2==0.20.2
 httptools==0.6.4
 httpx==0.28.1
 idna==3.7
-importlib-metadata==4.6.4
+importlib-metadata==8.6.1
 iniconfig==2.0.0
 isort==5.6.4
 itsdangerous==2.2.0
