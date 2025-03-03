@@ -31,6 +31,8 @@ distro==1.7.0
 distro-info==1.0
 dnspython==2.7.0
 ecdsa==0.17.0
+elastic-transport==8.17.0
+elasticsearch==8.0.0
 email_validator==2.2.0
 emails==0.6
 exceptiongroup==1.2.2
