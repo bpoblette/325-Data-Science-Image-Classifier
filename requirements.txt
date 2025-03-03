@@ -61,7 +61,7 @@ netifaces==0.11.0
 networkx==3.4.2
 numpy==1.26.4
 nvidia-cublas-cu12==12.4.5.8
-nvidia-cuda-cupti-cu12==12.4.127
+nvidia-cuda-cupti-cu12==12.8.57
 nvidia-cuda-nvrtc-cu12==12.4.127
 nvidia-cuda-runtime-cu12==12.4.127
 nvidia-cudnn-cu12==9.1.0.70
