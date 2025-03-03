@@ -1,16 +1,16 @@
 { pkgs ? import <nixpkgs> {} }:
 
 pkgs.stdenv.mkDerivation rec {
-  name = "my-project";
+  name = "my-python-project";
   src = ./.;
 
   buildInputs = [
-    pkgs.pkgconfig
+    pkgs.pkg-config
     pkgs.libcairo
     pkgs.meson
-    pkgs.cmake
     pkgs.gcc
-    pkgs.glibc
+    pkgs.python3
+    pkgs.python3Packages.virtualenv
   ];
 
   shellHook = ''
