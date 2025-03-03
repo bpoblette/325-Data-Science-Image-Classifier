@@ -48,7 +48,6 @@ fonttools==4.49.0
 fsspec==2025.2.0
 google-auth==2.6.0
 gunicorn==23.0.0
-gyp==0.1
 h11==0.14.0
 h2==4.1.0
 hpack==4.0.0
