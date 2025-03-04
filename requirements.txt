@@ -5,4 +5,3 @@ Pillow==11.1.0
 roboflow==1.1.53
 ultralytics==8.3.71
 uvicorn==0.34.0
-opencv-python-headless==4.7.0.72
