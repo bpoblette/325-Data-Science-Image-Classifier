@@ -22,9 +22,9 @@ class ImageClassifier:
         # Loop through results and display images
         for result in results:
             img = result.plot()  # Draw bounding boxes
-            # cv2.imshow("Detection", img)
-            # cv2.waitKey(0)  # Wait for key press
-            # cv2.destroyAllWindows()
+            cv2.imshow("Detection", img)
+            cv2.waitKey(0)  # Wait for key press
+            cv2.destroyAllWindows()
     
     def predict(self, image: np.ndarray):
         result = self.model.predict(source=image,conf=1, save=True, save_txt=True)
@@ -48,11 +48,11 @@ def main():
     dataset_yaml = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/data.yaml"
     
     # Train model
-    classifier.train(training_set=dataset_yaml, epochs=20, imgsz=640)
+    classifier.train(training_set=dataset_yaml, epochs=10, imgsz=640)
 
     # Testing the model
     test_images_folder = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/test/images"
-    classifier.test(test_images_folder)
+    classifier.test("zombie_test.jpg")
 
 if __name__ == "__main__":
     main()
