@@ -27,7 +27,7 @@ class ImageClassifier:
             cv2.destroyAllWindows()
     
     def predict(self, image: np.ndarray):
-        result = self.model.predict(source=image,conf=1, save=True, save_txt=True)
+        result = self.model.predict(source=image,conf=0.5, save=True, save_txt=True)
         predictions = []
 
         for r in result:
