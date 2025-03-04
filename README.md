@@ -13,3 +13,10 @@ How to push download updates:
 # Python Environement:
 ## To start Python environment
 * myenv\Scripts\activate
+
+# Hosting:
+## Frontend: Vercel
+https://325-data-science-image-classifier-pcu2da2ja-bpoblettes-projects.vercel.app/
+
+## Backend: Render
+https://three25-data-science-image-classifier.onrender.com
