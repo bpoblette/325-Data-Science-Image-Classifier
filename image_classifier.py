@@ -24,19 +24,19 @@ class ImageClassifier:
             lrf=0.1,              # Final LR fraction (cosine schedule)
             cos_lr=True,          # Cosine annealing
             weight_decay=0.0005,  # Helps with regularization
-            batch=8,              # Use -1 if you want YOLO to auto-adjust, but 8 works well for small data/GPU
+            batch=8,              # -1 allows YOLO to auto-adjust, or 8 due to no GPU support
 
-            # Augmentations (adjusted slightly for balance)
-            mosaic=0.75,          # 0.75 keeps strong augmentation without overdoing it
-            mixup=0.1,            # Lowered to avoid confusing class boundaries
+            # Augmentations
+            mosaic=0.75,
+            mixup=0.1,
             hsv_h=0.015,
             hsv_s=0.6,
             hsv_v=0.3,
-            flipud=0.3,           # Reduced to prevent too many unnatural flips
+            flipud=0.3,
             fliplr=0.5,
-            scale=0.4,            # Reduced scale to retain realism
+            scale=0.4,
             translate=0.1,
-            shear=5,              # Slightly reduced shear
+            shear=5,
             perspective=0.0003,   # Less perspective distortion for small dataset
 
             # Detection tweaks
@@ -80,7 +80,7 @@ def main():
     dataset_yaml = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/data.yaml"
     
     # Train model
-    classifier.train(training_set=dataset_yaml, epochs=50, imgsz=640, augment=True)
+    classifier.train(training_set=dataset_yaml, epochs=20, imgsz=640, augment=True)
 
     # Testing the model
     test_images_folder = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/test/images"
@@ -92,3 +92,5 @@ if __name__ == "__main__":
 # To do: Create a service which will take pictures using a computers camera. 
 
 # Graham advice: for Hyperparameters in the learning, mostly just play with learning rate and batch size
+
+# for confidence of 0.4 and above try to improve the iou of .5/95
