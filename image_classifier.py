@@ -2,18 +2,50 @@ from roboflow import Roboflow
 from ultralytics import YOLO
 import cv2
 import numpy as np
+import os
+
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 
 class ImageClassifier:
     def __init__(self):
-        self.rf = Roboflow(api_key="ujauwGnQ8zCBEuqgI3O7")
+        self.rf = Roboflow(api_key=ROBOFLOW_API_KEY)
         self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
         self.version = self.project.version(1)
         self.dataset = self.version.download("yolov8")
-        self.model = YOLO("runs/detect/train19/weights/best.pt")
+        self.model = YOLO("runs/detect/train27/weights/best.pt")
 
 
-    def train(self, training_set, epochs=20, imgsz=640):
-        self.model.train(data=training_set, epochs=epochs, imgsz=imgsz)
+    def train(self, training_set, epochs=20, imgsz=640, augment=True):
+        self.model.train(
+            data=training_set, 
+            epochs=epochs,
+            imgsz=imgsz,
+            lr0=0.001,            # Base learning rate
+            lrf=0.1,              # Final LR fraction (cosine schedule)
+            cos_lr=True,          # Cosine annealing
+            weight_decay=0.0005,  # Helps with regularization
+            batch=8,              # Use -1 if you want YOLO to auto-adjust, but 8 works well for small data/GPU
+
+            # Augmentations (adjusted slightly for balance)
+            mosaic=0.75,          # 0.75 keeps strong augmentation without overdoing it
+            mixup=0.1,            # Lowered to avoid confusing class boundaries
+            hsv_h=0.015,
+            hsv_s=0.6,
+            hsv_v=0.3,
+            flipud=0.3,           # Reduced to prevent too many unnatural flips
+            fliplr=0.5,
+            scale=0.4,            # Reduced scale to retain realism
+            translate=0.1,
+            shear=5,              # Slightly reduced shear
+            perspective=0.0003,   # Less perspective distortion for small dataset
+
+            # Detection tweaks
+            conf=0.25,
+            iou=0.45,
+            auto_augment=augment
+        )
+
+
 
     def test(self, test_images_folder):
         # Run detection on test images folder
@@ -27,7 +59,7 @@ class ImageClassifier:
             cv2.destroyAllWindows()
     
     def predict(self, image: np.ndarray):
-        result = self.model.predict(source=image,conf=0.5, save=True, save_txt=True)
+        result = self.model.predict(source=image,conf=0.1, save=True, save_txt=True)
         predictions = []
 
         for r in result:
@@ -48,7 +80,7 @@ def main():
     dataset_yaml = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/data.yaml"
     
     # Train model
-    classifier.train(training_set=dataset_yaml, epochs=10, imgsz=640)
+    classifier.train(training_set=dataset_yaml, epochs=50, imgsz=640, augment=True)
 
     # Testing the model
     test_images_folder = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/test/images"
@@ -58,3 +90,5 @@ if __name__ == "__main__":
     main()
 
 # To do: Create a service which will take pictures using a computers camera. 
+
+# Graham advice: for Hyperparameters in the learning, mostly just play with learning rate and batch size
