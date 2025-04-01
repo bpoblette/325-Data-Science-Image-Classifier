@@ -3,6 +3,7 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import os
+import time
 
 ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 
@@ -10,12 +11,12 @@ class ImageClassifier:
     def __init__(self):
         self.rf = Roboflow(api_key=ROBOFLOW_API_KEY)
         self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
-        self.version = self.project.version(1)
+        self.version = self.project.version(2)
         self.dataset = self.version.download("yolov8")
         self.model = YOLO("runs/detect/train30/weights/best.pt")
 
 
-    def train(self, training_set, epochs=20, imgsz=640, augment=True):
+    def train(self, training_set, epochs=20, imgsz=640):
         self.model.train(
             data=training_set, 
             epochs=epochs,
@@ -23,12 +24,12 @@ class ImageClassifier:
             lr0=0.001,            # Base learning rate
             lrf=0.1,              # Final LR fraction (cosine schedule)
             cos_lr=True,          # Cosine annealing
-            weight_decay=0.0005,  # Helps with regularization
-            batch=8,              # -1 allows YOLO to auto-adjust, or 8 due to no GPU support
+            weight_decay=0.001,  # Helps with regularization
+            batch=-1,              # -1 allows YOLO to auto-adjust, or 8 due to no GPU support
 
             # Augmentations
             mosaic=0.75,
-            mixup=0.1,
+            mixup=0.2,
             hsv_h=0.015,
             hsv_s=0.6,
             hsv_v=0.3,
@@ -40,16 +41,15 @@ class ImageClassifier:
             perspective=0.0003,   # Less perspective distortion for small dataset
 
             # Detection tweaks
-            conf=0.25,
+            conf=0.25, 
             iou=0.45,
-            auto_augment=augment
         )
 
 
 
     def test(self, test_images_folder):
         # Run detection on test images folder
-        results = self.model.predict(source=test_images_folder, conf=0.1, save=True, save_txt=True)
+        results = self.model.predict(source=test_images_folder, conf=0.5, save=True, save_txt=True)
 
         # Loop through results and display images
         for result in results:
@@ -59,7 +59,7 @@ class ImageClassifier:
             cv2.destroyAllWindows()
     
     def predict(self, image: np.ndarray):
-        result = self.model.predict(source=image,conf=0.1, save=True, save_txt=True)
+        result = self.model.predict(source=image,conf=0.5, save=True, save_txt=True)
         predictions = []
 
         for r in result:
@@ -77,14 +77,16 @@ def main():
     classifier = ImageClassifier()
 
     # Path to dataset YAML
-    dataset_yaml = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/data.yaml"
-    
+    dataset_yaml = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-2/data.yaml"
     # Train model
-    classifier.train(training_set=dataset_yaml, epochs=20, imgsz=640, augment=True)
-
+    training_start_time = time.time()
+    classifier.train(training_set=dataset_yaml, epochs=50, imgsz=640)
+    training_end_time = time.time()
+    total_training_time = training_end_time - training_start_time
     # Testing the model
-    test_images_folder = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-1/test/images"
-    classifier.test("zombie_test.jpg")
+    test_images_folder = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-2/test/images"
+    classifier.test(test_images_folder)
+    print(f"The Total testing time was: {total_training_time} seconds")
 
 if __name__ == "__main__":
     main()
@@ -93,4 +95,4 @@ if __name__ == "__main__":
 
 # Graham advice: for Hyperparameters in the learning, mostly just play with learning rate and batch size
 
-# for confidence of 0.4 and above try to improve the iou of .5/95
+# for confidence of 0.5 and above try to improve the iou of .5/95 

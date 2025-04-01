@@ -1,0 +1,14 @@
+names:
+- '-'
+- Zombie
+- human
+nc: 3
+roboflow:
+  license: CC BY 4.0
+  project: zombiedetection0.1-lcsaw
+  url: https://universe.roboflow.com/zombieimageclassification/zombiedetection0.1-lcsaw/dataset/2
+  version: 2
+  workspace: zombieimageclassification
+test: ../test/images
+train: ../train/images
+val: ../valid/images
