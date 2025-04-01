@@ -12,7 +12,7 @@ class ImageClassifier:
         self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
         self.version = self.project.version(1)
         self.dataset = self.version.download("yolov8")
-        self.model = YOLO("runs/detect/train27/weights/best.pt")
+        self.model = YOLO("runs/detect/train30/weights/best.pt")
 
 
     def train(self, training_set, epochs=20, imgsz=640, augment=True):

@@ -1,7 +1,11 @@
 <template>
-  <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold text-center mb-4">Zombie Data Science - Image Classifier</h1>
-    <div class="max-w-xl mx-auto">
+  <div
+    class="min-h-screen flex items-center justify-center bg-cover bg-center"
+    :style="`background-image: url(${require('@/assets/rick_grimes.jpg')})`"
+  >
+    <div class="container mx-auto p-4 bg-white bg-opacity-85 rounded-xl shadow-lg max-w-xl">
+      <h1 class="text-2xl font-bold text-center mb-4">Zombie Data Science - Image Classifier</h1>
+
       <form @submit.prevent="handleFileUpload">
         <div class="mb-4">
           <label for="file" class="block text-lg">Upload Image</label>
@@ -14,6 +18,30 @@
             @change="onFileChange"
           />
         </div>
+
+        <!-- Camera controls -->
+        <div class="mb-4">
+          <button
+            type="button"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg"
+            @click="startCamera"
+          >
+            Use Camera
+          </button>
+        </div>
+
+        <div v-if="showCamera">
+          <video ref="video" autoplay class="w-full rounded-lg mb-2"></video>
+          <button
+            type="button"
+            class="bg-yellow-500 text-white px-4 py-2 rounded-lg mb-4"
+            @click="captureImage"
+          >
+            Capture
+          </button>
+          <canvas ref="canvas" class="hidden"></canvas>
+        </div>
+
         <button
           type="submit"
           class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg mt-4"
@@ -41,14 +69,14 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   data() {
     return {
-      selectedFile: "",
+      selectedFile: null,
       predictedImage: "",
-      predictions: [], 
+      predictions: [],
+      showCamera: false,
     };
   },
   methods: {
@@ -56,9 +84,39 @@ export default {
       this.selectedFile = event.target.files[0];
     },
 
+    startCamera() {
+      this.showCamera = true;
+      const video = this.$refs.video;
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((err) => {
+          console.error("Camera access denied:", err);
+          alert("Could not access camera.");
+        });
+    },
+
+    captureImage() {
+      const video = this.$refs.video;
+      const canvas = this.$refs.canvas;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext("2d");
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob((blob) => {
+        this.selectedFile = new File([blob], "captured.png", { type: "image/png" });
+        // Stop the camera after capture
+        video.srcObject.getTracks().forEach((track) => track.stop());
+        this.showCamera = false;
+      });
+    },
+
     async handleFileUpload() {
       if (!this.selectedFile) {
-        alert("Please select a file to upload.");
+        alert("Please select or capture a file.");
         return;
       }
 
@@ -66,7 +124,6 @@ export default {
       formData.append("file", this.selectedFile);
 
       try {
-        // Make the API request to predict
         const response = await fetch("http://127.0.0.1:8000/predict/", {
           method: "POST",
           body: formData,
@@ -77,10 +134,8 @@ export default {
         }
 
         const result = await response.json();
-
-        // Handle the result (base64 image and predictions)
-        this.predictedImage = result.image; 
-        this.predictions = result.predictions; 
+        this.predictedImage = result.image;
+        this.predictions = result.predictions;
       } catch (error) {
         console.error("Error uploading file:", error);
         alert("Something went wrong. Please try again.");
@@ -90,8 +145,12 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .container {
-  max-width: 600px;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 </style>
