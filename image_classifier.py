@@ -13,7 +13,7 @@ class ImageClassifier:
         self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
         self.version = self.project.version(2)
         self.dataset = self.version.download("yolov8")
-        self.model = YOLO("runs/detect/train37/weights/best.pt")
+        self.model = YOLO("yolov8n.pt")
 
 
     def train(self, training_set, epochs=20, imgsz=640):
@@ -21,24 +21,25 @@ class ImageClassifier:
             data=training_set, 
             epochs=epochs,
             imgsz=imgsz,
-            lr0=0.001,            # Base learning rate
-            lrf=0.1,              # Final LR fraction (cosine schedule)
+            lr0=0.0005,            # Base learning rate
+            lrf=0.05,              # Final LR fraction (cosine schedule)
             cos_lr=True,          # Cosine annealing
             weight_decay=0.001,  # Helps with regularization
             batch=8,              # -1 allows YOLO to auto-adjust, or 8 due to no GPU support
 
             # Augmentations
-            mosaic=0.75,
-            mixup=0.2,
+            mosaic=0.1,
+            mixup=0.0,
             hsv_h=0.015,
-            hsv_s=0.6,
-            hsv_v=0.3,
-            flipud=0.3,
-            fliplr=0.5,
-            scale=0.4,
-            translate=0.1,
-            shear=5,
-            perspective=0.0003,   # Less perspective distortion for small dataset
+            hsv_s=0.4,
+            hsv_v=0.2,
+            flipud=0.1,
+            fliplr=0.2,
+            scale=0.3,
+            translate=0.05,
+            shear=1,
+            perspective=0.00005,
+
 
             # Detection tweaks
             conf=0.25, 
@@ -59,7 +60,7 @@ class ImageClassifier:
             cv2.destroyAllWindows()
     
     def predict(self, image: np.ndarray):
-        result = self.model.predict(source=image,conf=0.5, save=True, save_txt=True)
+        result = self.model.predict(source=image,conf=0.6, save=True, save_txt=True)
         predictions = []
 
         for r in result:
@@ -80,12 +81,12 @@ def main():
     dataset_yaml = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-2/data.yaml"
     # Train model
     training_start_time = time.time()
-    classifier.train(training_set=dataset_yaml, epochs=20, imgsz=640)
+    classifier.train(training_set=dataset_yaml, epochs=50, imgsz=800)
     training_end_time = time.time()
     total_training_time = training_end_time - training_start_time
     # Testing the model
     test_images_folder = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-2/test/images"
-    classifier.test("zombie_and_human_test.jpg")
+    classifier.test(test_images_folder)
     print(f"The Total testing time was: {total_training_time} seconds")
 
 if __name__ == "__main__":

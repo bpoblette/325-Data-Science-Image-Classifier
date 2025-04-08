@@ -17,6 +17,10 @@ app.add_middleware(
     allow_headers=["*"], 
 )
 
+@app.get("/")
+def read_root():
+    return {"message": "Zombie Classifier API is running!"}
+
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):  
     image_classifier = ImageClassifier()
