@@ -10,10 +10,25 @@ ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
 class ImageClassifier:
     def __init__(self):
         self.rf = Roboflow(api_key=ROBOFLOW_API_KEY)
-        self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
-        self.version = self.project.version(2)
-        self.dataset = self.version.download("yolov8")
-        self.model = YOLO("yolov8n.pt")
+
+        dataset_path = "Zombiedetection0.1-2"
+
+        if not os.path.exists(dataset_path):
+            print("Downloading dataset from Roboflow...")
+            self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
+            self.version = self.project.version(2)
+            self.dataset = self.version.download("yolov8")
+        else:
+            print("Dataset already downloaded. Skipping Roboflow download.")
+
+        model_path = "runs/detect/train37/weights/best.pt"
+
+        if os.path.exists(model_path):
+            self.model = YOLO(model_path)
+        else:
+            print("Model not found, using yolov8n.pt instead.")
+            self.model = YOLO("yolov8n.pt")
+
 
 
     def train(self, training_set, epochs=20, imgsz=640):
