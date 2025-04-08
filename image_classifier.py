@@ -13,7 +13,7 @@ class ImageClassifier:
         self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
         self.version = self.project.version(2)
         self.dataset = self.version.download("yolov8")
-        self.model = YOLO("runs/detect/train30/weights/best.pt")
+        self.model = YOLO("runs/detect/train37/weights/best.pt")
 
 
     def train(self, training_set, epochs=20, imgsz=640):
@@ -25,7 +25,7 @@ class ImageClassifier:
             lrf=0.1,              # Final LR fraction (cosine schedule)
             cos_lr=True,          # Cosine annealing
             weight_decay=0.001,  # Helps with regularization
-            batch=-1,              # -1 allows YOLO to auto-adjust, or 8 due to no GPU support
+            batch=8,              # -1 allows YOLO to auto-adjust, or 8 due to no GPU support
 
             # Augmentations
             mosaic=0.75,
@@ -80,12 +80,12 @@ def main():
     dataset_yaml = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-2/data.yaml"
     # Train model
     training_start_time = time.time()
-    classifier.train(training_set=dataset_yaml, epochs=50, imgsz=640)
+    classifier.train(training_set=dataset_yaml, epochs=20, imgsz=640)
     training_end_time = time.time()
     total_training_time = training_end_time - training_start_time
     # Testing the model
     test_images_folder = "/home/bpoblette/325-Data-Science-Image-Classifier/ZombieDetection0.1-2/test/images"
-    classifier.test(test_images_folder)
+    classifier.test("zombie_and_human_test.jpg")
     print(f"The Total testing time was: {total_training_time} seconds")
 
 if __name__ == "__main__":
