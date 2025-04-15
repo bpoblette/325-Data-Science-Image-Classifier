@@ -27,7 +27,6 @@ def read_root():
 
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):  
-    # Don't re-initialize the model here
 
     # Read and process the image
     image_bytes = await file.read()
