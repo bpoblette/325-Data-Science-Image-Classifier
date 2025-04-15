@@ -1,11 +1,13 @@
+# main.py or app.py
+
 from fastapi import FastAPI, File, UploadFile
 from io import BytesIO
 from PIL import Image
 import numpy as np
 import cv2
-from image_classifier import ImageClassifier
 import base64
 from fastapi.middleware.cors import CORSMiddleware
+from image_classifier import ImageClassifier
 
 app = FastAPI()
 
@@ -17,24 +19,26 @@ app.add_middleware(
     allow_headers=["*"], 
 )
 
+image_classifier = ImageClassifier()
+
 @app.get("/")
 def read_root():
     return {"message": "Zombie Classifier API is running!"}
 
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):  
-    image_classifier = ImageClassifier()
+    # Don't re-initialize the model here
 
-    # Read the image file
+    # Read and process the image
     image_bytes = await file.read()
     image = Image.open(BytesIO(image_bytes)).convert("RGB")
     image = np.array(image)
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-    # Get predictions
+    # Run prediction
     predictions = image_classifier.predict(image=image)
     
-    # Draw bounding boxes on the image
+    # Draw bounding boxes
     for pred in predictions:
         bbox = pred['bbox']
         cv2.rectangle(image, 
@@ -48,7 +52,6 @@ async def predict(file: UploadFile = File(...)):
                     0.9, 
                     (255, 0, 0), 2)
 
-    # Convert the image to a base64 string
     _, buffer = cv2.imencode('.jpg', image)
     base64_image = base64.b64encode(buffer).decode('utf-8')
 
@@ -57,4 +60,3 @@ async def predict(file: UploadFile = File(...)):
         "predictions": predictions,
         "image": f"data:image/jpeg;base64,{base64_image}"
     }
-
