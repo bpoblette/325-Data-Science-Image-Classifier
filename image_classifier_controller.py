@@ -1,5 +1,3 @@
-# main.py or app.py
-
 from fastapi import FastAPI, File, UploadFile
 from io import BytesIO
 from PIL import Image

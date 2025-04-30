@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:18-alpine
 
 WORKDIR /app
 
@@ -7,8 +7,5 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+EXPOSE 8080
 
-RUN npm install -g serve
-
-CMD ["serve", "-s", "dist", "-l", "8080"]

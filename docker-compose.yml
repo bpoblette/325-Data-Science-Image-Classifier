@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   backend:
     build:
@@ -7,13 +9,23 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
+    env_file:
+      - .env
     depends_on:
       - frontend
 
   frontend:
-    build: ./vue-frontend
+    build:
+      context: ./vue-frontend
     container_name: vue-frontend
     ports:
       - "8080:8080"
     volumes:
       - ./vue-frontend:/app
+    env_file:
+      - .env
+    working_dir: /app
+    command: npm run serve
+
+volumes:
+  appdata:
