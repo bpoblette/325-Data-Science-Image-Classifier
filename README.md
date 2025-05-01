@@ -10,10 +10,10 @@ How to push download updates:
 I setup the project to run with a docker-compose file
 In the terminal:
 To build the images for docker, copy and paste this command
-  docker-compose build
+* docker-compose build
 This will create the images neccessary for docker as well as download all dependencies and node modules
 Once that command is done:
-  docker-compose start
+* docker-compose start
 This will start the app locally. Python will start the fastapi and the vue development server.
 
 # Routes:
