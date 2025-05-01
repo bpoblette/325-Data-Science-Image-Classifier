@@ -1,5 +1,6 @@
 # 325-Data-Science-Image-Classifier
 
+## Ignore this step. Building the docker container handles this for you
 How to install requirement.txt:
   pip install -r requirements.txt
 
