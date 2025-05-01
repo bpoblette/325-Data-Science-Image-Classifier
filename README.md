@@ -6,6 +6,16 @@ How to install requirement.txt:
 How to push download updates:
   pip freeze > requirements.txt
 
+# Running the Project
+I setup the project to run with a docker-compose file
+In the terminal:
+To build the images for docker, copy and paste this command
+  docker-compose build
+This will create the images neccessary for docker as well as download all dependencies and node modules
+Once that command is done:
+  docker-compose start
+This will start the app locally. Python will start the fastapi and the vue development server.
+
 # Routes:
 ## Predict Route:
 * http://127.0.0.1:8000/predict
