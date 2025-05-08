@@ -17,7 +17,7 @@ class ImageClassifier:
             print("Downloading dataset from Roboflow...")
             self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
             self.version = self.project.version(2)
-            self.dataset = self.version.download("runs/detect/train42/results.csv")
+            self.dataset = self.version.download("runs/detect/train46/results.csv")
         else:
             print("Dataset already downloaded. Skipping Roboflow download.")
 
@@ -75,7 +75,7 @@ class ImageClassifier:
             cv2.destroyAllWindows()
     
     def predict(self, image: np.ndarray):
-        result = self.model.predict(source=image,conf=0.5, save=True, save_txt=True)
+        result = self.model.predict(source=image,conf=0.7, save=True, save_txt=True)
         predictions = []
 
         for r in result:
