@@ -3,162 +3,164 @@
     class="min-h-screen flex items-center justify-center bg-cover bg-center"
     :style="`background-image: url(${require('@/assets/rick_grimes.jpg')})`"
   >
-    <div class="container mx-auto p-4 bg-white bg-opacity-85 rounded-xl shadow-lg max-w-xl">
-      <h1 class="text-2xl font-bold text-center mb-4">Zombie Data Science - Image Classifier</h1>
+    <div class="bg-black bg-opacity-80 text-white p-6 rounded-2xl shadow-xl w-full max-w-lg">
+      <h1 class="text-3xl font-bold text-center mb-6">Zombie Classifier</h1>
 
-      <form @submit.prevent="handleFileUpload">
-        <div class="mb-4">
-          <label for="file" class="block text-lg">Upload Image</label>
-          <input
-            type="file"
-            id="file"
-            class="mt-2"
-            ref="fileInput"
-            accept="image/*"
-            @change="onFileChange"
-          />
-        </div>
-
-        <!-- Camera controls -->
-        <div class="mb-4">
-          <button
-            type="button"
-            class="bg-green-600 text-white px-4 py-2 rounded-lg"
-            @click="startCamera"
-          >
-            Use Camera
-          </button>
-        </div>
-
-        <div v-if="showCamera">
-          <video ref="video" autoplay class="w-full rounded-lg mb-2"></video>
-          <button
-            type="button"
-            class="bg-yellow-500 text-white px-4 py-2 rounded-lg mb-4"
-            @click="captureImage"
-          >
-            Capture
-          </button>
-          <canvas ref="canvas" class="hidden"></canvas>
-        </div>
-
-        <button
-          type="submit"
-          class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg mt-4"
-        >
-          Upload and Predict
+      <!-- Tabs -->
+      <div class="flex mb-4 rounded-lg overflow-hidden border border-gray-700">
+        <button @click="activeTab = 'upload'" :class="tabClass('upload')">
+          <i class="fas fa-upload mr-2"></i> Upload
         </button>
-      </form>
-
-      <!-- Displaying the result image -->
-      <div v-if="predictedImage" class="mt-6">
-        <h2 class="text-xl font-semibold text-center">Predicted Image</h2>
-        <img :src="predictedImage" alt="Predicted Zombies" class="mx-auto mt-4 rounded-lg" />
+        <button @click="activeTab = 'camera'" :class="tabClass('camera')">
+          <i class="fas fa-camera mr-2"></i> Camera
+        </button>
       </div>
 
-      <!-- Display predictions -->
-      <div v-if="predictions.length" class="mt-4">
-        <h3 class="text-xl font-semibold">Predictions:</h3>
-        <ul>
-          <li v-for="(prediction, index) in predictions" :key="index">
-            <p><strong>Zombie {{ index + 1 }}:</strong> {{ prediction.class }} - Confidence: {{ prediction.confidence }}</p>
-            <p><strong>Bounding Box:</strong> {{ prediction.bbox.join(', ') }}</p>
-          </li>
-        </ul>
+      <!-- Upload Tab -->
+      <div v-if="activeTab === 'upload'" class="space-y-4">
+        <label class="block text-sm font-medium text-gray-300">Choose an image</label>
+        <input
+          type="file"
+          accept="image/*"
+          @change="onFileChange"
+          class="w-full bg-gray-800 text-white border border-gray-600 rounded-lg p-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-600 hover:file:bg-green-700 file:text-white"
+        />
       </div>
+
+      <!-- Camera Tab -->
+      <div v-if="activeTab === 'camera'" class="space-y-4">
+        <video ref="video" autoplay playsinline class="rounded-xl w-full border border-gray-600"></video>
+        <button
+          @click="captureImage"
+          class="bg-green-600 hover:bg-green-700 w-full py-2 px-4 rounded-lg text-white font-semibold"
+        >
+          Capture Image
+        </button>
+        <canvas ref="canvas" class="hidden"></canvas>
+      </div>
+
+      <!-- Image Preview -->
+      <div v-if="imagePreview" class="mt-6">
+        <img :src="imagePreview" class="w-full rounded-xl" />
+      </div>
+
+        <!-- Result Section -->
+      <div v-if="loading" class="text-center mt-4 text-green-400 font-semibold">
+        Detecting...
+      </div>
+
+      <div v-if="result" class="mt-4 text-center bg-gray-800 rounded-xl p-4">
+        <p class="text-lg font-bold text-white">Result:</p>
+        <p class="text-xl mt-2">
+          <span :class="result.class === 'zombie' ? 'text-red-500' : 'text-green-500'">
+            {{ result.class.toUpperCase() }}
+          </span>
+          <br />
+          <span class="text-sm text-gray-400">Confidence: {{ (result.confidence * 100).toFixed(1) }}%</span>
+        </p>
+
+        <div v-if="result.image" class="mt-4">
+          <img :src="result.image" class="rounded-xl border border-gray-600" />
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
+
 <script>
 export default {
   data() {
     return {
-      selectedFile: null,
-      predictedImage: "",
-      predictions: [],
-      showCamera: false,
+      activeTab: 'upload',
+      imagePreview: null,
+      loading: false,
+      result: null,
     };
   },
   methods: {
-    onFileChange(event) {
-      this.selectedFile = event.target.files[0];
+    tabClass(tab) {
+      return [
+        'flex-1 text-center py-2 px-4 transition font-semibold',
+        this.activeTab === tab
+          ? 'bg-green-600 text-white'
+          : 'bg-gray-700 hover:bg-gray-600 text-gray-300',
+      ];
     },
+    onFileChange(e) {
+      const file = e.target.files[0];
+      if (file) {
+        this.imagePreview = URL.createObjectURL(file);
+        this.sendToModel(file);
+      }
+    },
+    async sendToModel(imageFile) {
+      this.loading = true;
+      this.result = null;
 
-    startCamera() {
-      this.showCamera = true;
-      const video = this.$refs.video;
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          video.srcObject = stream;
-        })
-        .catch((err) => {
-          console.error("Camera access denied:", err);
-          alert("Could not access camera.");
+      const formData = new FormData();
+      formData.append("file", imageFile);
+
+      try {
+        const res = await fetch("https://three25-data-science-image-classifier.onrender.com/predict/", {
+          method: "POST",
+          body: formData,
         });
-    },
+        const data = await res.json();
 
+        if (data.predictions && data.predictions.length > 0) {
+          this.result = {
+            class: data.predictions[0].class,
+            confidence: data.predictions[0].confidence,
+            image: data.image,
+          };
+        } else {
+          this.result = {
+            class: "unknown",
+            confidence: 0,
+            image: data.image,
+          };
+        }
+      } catch (err) {
+        console.error("Prediction failed:", err);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        this.$refs.video.srcObject = stream;
+      } catch (err) {
+        console.error('Camera access denied:', err);
+      }
+    },
     captureImage() {
       const video = this.$refs.video;
       const canvas = this.$refs.canvas;
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      const context = canvas.getContext("2d");
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
+      canvas.getContext('2d').drawImage(video, 0, 0);
       canvas.toBlob((blob) => {
-        this.selectedFile = new File([blob], "captured.png", { type: "image/png" });
-        // Stop the camera after capture
-        video.srcObject.getTracks().forEach((track) => track.stop());
-        this.showCamera = false;
+        this.imagePreview = canvas.toDataURL('image/png');
+        if (blob) {
+          const file = new File([blob], 'capture.png', { type: 'image/png' });
+          this.sendToModel(file);
+        }
       });
     },
-
-    async handleFileUpload() {
-      if (!this.selectedFile) {
-        alert("Please select or capture a file.");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("file", this.selectedFile);
-
-      // try {
-      //   const response = await fetch(`${process.env.VUE_APP_API_URL}/predict/`, {  
-      //     method: "POST",
-      //     body: formData,
-      //   });
-      //   // * http://127.0.0.1:8000/predict for local host
-      //   if (!response.ok) {
-      //     throw new Error("Failed to get prediction from API");
-      //   }
-        try {
-        const response = await fetch(`http://127.0.0.1:8000/predict`, {  
-          method: "POST",
-          body: formData,
-        });
-        if (!response.ok) {
-          throw new Error("Failed to get prediction from API");
-        }
-
-        const result = await response.json();
-        this.predictedImage = result.image;
-        this.predictions = result.predictions;
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        alert("Something went wrong. Please try again.");
+  },
+  watch: {
+    activeTab(val) {
+      if (val === 'camera') {
+        this.startCamera();
       }
     },
   },
 };
 </script>
 
-
-<style scoped>
-.container {
-  background-color: rgba(255, 255, 255, 0.85);
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
+<!-- Font Awesome for icons -->
+<style>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
 </style>

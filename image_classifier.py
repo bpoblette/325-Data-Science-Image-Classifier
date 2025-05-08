@@ -17,7 +17,7 @@ class ImageClassifier:
             print("Downloading dataset from Roboflow...")
             self.project = self.rf.workspace("zombieimageclassification").project("zombiedetection0.1-lcsaw")
             self.version = self.project.version(2)
-            self.dataset = self.version.download("runs/detect/train40/results.csv")
+            self.dataset = self.version.download("runs/detect/train42/results.csv")
         else:
             print("Dataset already downloaded. Skipping Roboflow download.")
 
